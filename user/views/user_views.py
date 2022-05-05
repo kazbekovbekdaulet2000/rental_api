@@ -53,27 +53,29 @@ def send_OTP(mail):
 
 
 class ResetPassword(APIView):
-    type = ''
-
     def post(self, request, *args, **kwargs):
-        u = get_object_or_404(User, email=request.data['email'])
-        if self.type == "force":
+        if not cache.get(request.data['email']):
             send_OTP(request.data['email'])
             return Response({"time": cache.ttl(request.data['email'])}, status=status.HTTP_201_CREATED)
-        if self.type == "reset":
-            if not cache.get(request.data['email']):
-                send_OTP(request.data['email'])
-                return Response({"time": cache.ttl(request.data['email'])}, status=status.HTTP_201_CREATED)
-            else:
-                return Response({"time": cache.ttl(request.data['email'])}, status=status.HTTP_200_OK)
-        if self.type == "confirm":
-            if cache.get(request.data['email']) == None:
-                return Response({"message": "Timeout"}, status=status.HTTP_408_REQUEST_TIMEOUT)
-            if cache.get(request.data['email']) == request.data['code']:
-                if (request.data['password'] == request.data['re_password']):
-                    user = get_object_or_404(User, email=request.data['email'])
-                    user.set_password(request.data['password'])
-                    user.save()
-                    cache.delete(request.data['email'])
-                    return Response({"message": "Пароль изменен"}, status=status.HTTP_201_CREATED)
-            return Response({"message": "Код неправильный"}, status=status.HTTP_400_BAD_REQUEST)
+        else:
+            return Response({"time": cache.ttl(request.data['email'])}, status=status.HTTP_200_OK)
+
+
+class ConfirmPassword(APIView):
+    def post(self, request, *args, **kwargs):
+        user = get_object_or_404(User, email=request.data['email'])
+        if cache.get(request.data['email']) == None:
+            return Response({"message": "Timeout"}, status=status.HTTP_408_REQUEST_TIMEOUT)
+        if cache.get(request.data['email']) == request.data['code']:
+            if (request.data['password'] == request.data['re_password']):
+                user.set_password(request.data['password'])
+                user.save()
+                cache.delete(request.data['email'])
+                return Response({"message": "Пароль изменен"}, status=status.HTTP_201_CREATED)
+        return Response({"message": "Код неправильный"}, status=status.HTTP_400_BAD_REQUEST)
+
+
+class ForcePassword(APIView):
+    def post(self, request, *args, **kwargs):
+        send_OTP(request.data['email'])
+        return Response({"time": cache.ttl(request.data['email'])}, status=status.HTTP_201_CREATED)
