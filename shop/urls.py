@@ -16,14 +16,16 @@ from shop.views.timetable_view import ProductTimeTableList
 
 urlpatterns = [
      path('categories/', CategoryList.as_view()),
+
+     # product list 
      path('products/', ProductList.as_view()),
      path('products/my/', ProductMyList.as_view()),
      path('products/bookmarked/', ProductBookmarkedList.as_view()),
      path('products/favorite/', ProductFavoriteList.as_view()),
+     
+     # product item
      path('products/<int:id>/', ProductDetail.as_view()),
-
      path('products/<int:id>/related/', ProductRelatedList.as_view()),
-     path('products/<int:id>/timetable/', ProductAvailabilityList.as_view()),
      path('products/<int:id>/images/', ProductImageList.as_view()),
 
      # product reactions
@@ -50,7 +52,8 @@ urlpatterns = [
      path('products/<int:id>/reviews/<int:review_id>/save/',
           BookmarkAction.as_view(model=Review, lookup_field='review_id')),
 
-     # rent process
+     # renting process
+     path('products/<int:id>/timetable/', ProductAvailabilityList.as_view()),
      path('products/<int:id>/requests/', ProductTimeTableList.as_view()),
      path('products/<int:id>/requests/<int:request_id>/', ProductRentView.as_view()),
      path('products/<int:id>/requests/<int:request_id>/confirm/', confirm),

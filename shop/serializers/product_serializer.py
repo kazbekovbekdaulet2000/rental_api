@@ -6,7 +6,7 @@ from user.serializers.user_serializer import UserInfoSerializer
 
 
 class ProductBaseSerializer(serializers.ModelSerializer):
-    images = ImageSerializer(many=True)
+    images = ImageSerializer(many=True, read_only=True)
     tags = TagSerializer(many=True)
     available = serializers.SerializerMethodField()
     owner = UserInfoSerializer(read_only=True)

@@ -71,7 +71,7 @@ class ProductFavoriteList(generics.ListAPIView):
         return Product.objects.filter(id__in=ids)
 
 
-class ProductDetail(generics.RetrieveDestroyAPIView):
+class ProductDetail(generics.RetrieveUpdateDestroyAPIView):
     lookup_field = 'id'
     permission_classes = (IsOwnerAndLandlord,)
     queryset = Product.objects.all()
