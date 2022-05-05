@@ -2,7 +2,7 @@
 # API для аренды товаров разного вида (камеры, машины для разных нужд и тд)
 
 # Class Diagram
-![alt text](http://url/to/img.png)
+![alt text](https://github.com/kazbekovbekdaulet2000/rental_api/blob/master/class_diagram.png)
 
 # Авторизация
 JWT (Simple JWT) - так как там встроен токены для access/refresh
