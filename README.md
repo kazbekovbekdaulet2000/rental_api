@@ -2,7 +2,7 @@
 # API для аренды товаров разного вида (камеры, машины для разных нужд и тд)
 
 # Class Diagram
-![alt text](https://github.com/kazbekovbekdaulet2000/rental_api/blob/master/class_diagram.png)
+![alt text](https://github.com/kazbekovbekdaulet2000/rental_api/blob/master/materials/class_diagram.png)
 
 # Авторизация
 JWT (Simple JWT) - так как там встроен токены для access/refresh
@@ -10,6 +10,8 @@ Django roles - tenant, landlord (арентодатор, арентодател�
 Поля для usera - email, name, surname, firstname, birthdate,
 через signals создается one to one relation для профиля  
 Сброс пароля через email
+
+![alt text](https://github.com/kazbekovbekdaulet2000/rental_api/blob/master/materials/auth_openapi.png)
 
 # Вход
 Арендатор и Арендодатель проходят авторизацию в одном окне, без переключения режима авторизаций (tentor или lessor), вводится Email, Пароль. Отличия tentor от lessor проявляются в user permissions и типе доступных запросов после авторизаций. 
