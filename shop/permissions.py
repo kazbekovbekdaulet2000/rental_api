@@ -26,6 +26,17 @@ class ProductOwnerAndLandlord(permissions.BasePermission):
         return obj.product.owner == request.user and Group.objects.get(name='landlord') in request.user.groups.all()
 
 
+class RentRequestParticipantsOrAdmin(permissions.BasePermission):
+    def has_object_permission(self, request, view, obj):
+        if request.user.is_superuser:
+            return True
+        if obj.product.owner == request.user and Group.objects.get(name='landlord'):
+            return True
+        if obj.tenant.id == request.user.id:
+            return True
+        return False
+
+
 class ObjectOwnerOrAdmin(permissions.BasePermission):
     edit_methods = ("POST", "PUT", "PATCH", "DELETE")
 

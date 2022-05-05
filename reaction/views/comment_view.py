@@ -24,7 +24,8 @@ class CommentList(generics.ListCreateAPIView):
 class CommentDetail(generics.RetrieveUpdateDestroyAPIView):
     lookup_field = 'id'
     lookup_url_kwarg = 'comment_id'
-    permission_classes = [ObjectOwnerOrAdmin,permissions.IsAuthenticatedOrReadOnly]
+    permission_classes = [
+        permissions.IsAuthenticatedOrReadOnly, ObjectOwnerOrAdmin]
     model = None
 
     def get_serializer_class(self):
@@ -35,18 +36,4 @@ class CommentDetail(generics.RetrieveUpdateDestroyAPIView):
 
     def get_queryset(self):
         return Comment.objects\
-            .get_object_by_model(model=self.model, id=self.kwargs.get(self.lookup_field))\
-
-
-# class CommentLike(APIView):
-#     permission_classes = [permissions.IsAuthenticated]
-#     model = None
-
-#     def post(self, request, *args, **kwargs):
-#         item = Comment.objects.get(id=self.kwargs['comment_id'])
-#         if(request.user in item.likes.all()):
-#             item.likes.remove(request.user)
-#             return Response({"liked": False}, status=status.HTTP_202_ACCEPTED)
-#         else:
-#             item.likes.add(request.user)
-#             return Response({"liked": True}, status=status.HTTP_202_ACCEPTED)
+            .get_object_by_model(model=self.model, id=self.kwargs.get(self.lookup_field))

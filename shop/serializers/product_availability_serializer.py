@@ -16,7 +16,6 @@ class ProductAvailabilitySerializer(ProductBaseAvailabilitySerializer):
     available = serializers.SerializerMethodField()
 
     def get_available(self, obj: ProductTime):
-        print(obj.tenant)
         return obj.tenant == None
 
     class Meta:

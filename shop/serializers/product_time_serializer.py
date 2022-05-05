@@ -24,10 +24,11 @@ class ProductTimeTableSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = ProductTimeTable
-        fields = ('product', 'id', 'tenant', 'total_price', 'times')
+        fields = ('product', 'id', 'tenant', 'total_price', 'times', 'approved')
 
 
 class ProductTimeTableCreateSerializer(serializers.Serializer):
+    id = serializers.IntegerField(read_only=True)
     product = serializers.PrimaryKeyRelatedField(
         queryset=Product.objects.all())
     times = serializers.ListField(
@@ -35,11 +36,19 @@ class ProductTimeTableCreateSerializer(serializers.Serializer):
 
     def validate(self, attrs):
         product = attrs['product']
-        times = ProductTime.objects.filter(
-            product=product).values_list('id', flat=True)
+        obj_times = ProductTime.objects.filter(product=product)
+
+        if(ProductTimeTable.objects.filter(
+                tenant=self.context['request'].user, product=product, times=attrs['times']).exists()):
+            raise ValidationError('record already exists')
+
         for time in attrs['times']:
-            if(not time in list(times)):
+            if(not time in list(obj_times.values_list('id', flat=True))):
                 raise ValidationError('time id is not true')
+        for time in obj_times:
+            if((time.id in attrs['times']) and (not time.tenant == None)):
+                raise ValidationError(
+                    f'{time.start_time}-{time.end_time} is not free for rent')
         return attrs
 
     def create(self, validated_data):

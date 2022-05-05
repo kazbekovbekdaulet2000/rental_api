@@ -1,17 +1,15 @@
+from django.forms import ValidationError
+from django.shortcuts import get_object_or_404
 from rest_framework import serializers
 from reaction.models.review import Review
 from django.contrib.contenttypes.models import ContentType
+from reaction.serializers.generic_serializer import ReactionGenericSerializer
 
-from user.serializers.user_serializer import UserInfoSerializer
 
-
-class ReviewSerializer(serializers.ModelSerializer):
-    owner = UserInfoSerializer(read_only=True)
-
+class ReviewSerializer(ReactionGenericSerializer):
     class Meta:
         model = Review
-        fields = ('id', 'rating', 'owner', 'created_at',
-                  'updated_at', 'likes_count', 'bookmarks_count')
+        fields = ReactionGenericSerializer.Meta.fields + ('rating', 'owner')
 
 
 class ReviewCreateSerializer(serializers.ModelSerializer):
@@ -20,6 +18,10 @@ class ReviewCreateSerializer(serializers.ModelSerializer):
         fields = ('id', 'rating')
 
     def validate(self, attrs):
+        id = self.context['view'].kwargs[self.context['view'].lookup_field]
+        user = self.context['request'].user
+        if(Review.objects.get_object_by_user(self.context['view'].model, id, user).exists() and self.context['request'].method == "POST"):
+            raise ValidationError('already exists')
         return super().validate(attrs)
 
     def create(self, validated_data):

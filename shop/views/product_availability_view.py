@@ -9,6 +9,9 @@ class ProductAvailabilityList(generics.ListCreateAPIView):
     permission_classes = [permissions.IsAuthenticatedOrReadOnly, ProductOwnerAndLandlord]
     queryset = ProductTime.objects.all()
 
+    def get_queryset(self):
+        return ProductTime.objects.filter(product_id=self.kwargs['id'])
+
     def get_serializer_class(self):
         if(self.request.method =="POST"):
             return ProductAvailabilityCreateSerializer

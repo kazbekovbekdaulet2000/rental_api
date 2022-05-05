@@ -47,6 +47,7 @@ class ContentTypeModel(models.Model):
 class ReactionsAbstract(models.Model):
     likes_count = models.PositiveIntegerField(default=0)
     comments_count = models.PositiveIntegerField(default=0)
+    reviews_count = models.PositiveIntegerField(default=0)
     bookmarks_count = models.PositiveIntegerField(default=0)
 
     class Meta:

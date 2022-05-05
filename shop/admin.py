@@ -14,7 +14,7 @@ class ProductImageAdmin(admin.TabularInline):
 
 
 class ProductAdmin(admin.ModelAdmin):
-    readonly_fields = ('likes_count', 'comments_count', 'bookmarks_count')
+    readonly_fields = ('likes_count', 'comments_count', 'reviews_count', 'bookmarks_count')
     search_fields = ('name', 'description')
     inlines = [ProductImageAdmin]
 

@@ -21,7 +21,7 @@ class ProductTime(AbstractModel):
     product = models.ForeignKey(Product, related_name='timetable', on_delete=models.CASCADE, null=False, blank=True)
     start_time = models.DateTimeField(null=False)
     end_time = models.DateTimeField(null=False)
-    tenant = models.ForeignKey(User, on_delete=models.CASCADE, null=True)
+    tenant = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
 
     objects = ProductTimeManager()
 

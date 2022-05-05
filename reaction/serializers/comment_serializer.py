@@ -1,19 +1,21 @@
+from django.forms import ValidationError
 from rest_framework import serializers
+from reaction.bad_words import BAD_WORDS
 from reaction.models.comment import Comment
+from reaction.serializers.generic_serializer import ReactionGenericSerializer
 from shop.serializers.category_serializer import RecursiveSerializer
 from django.contrib.contenttypes.models import ContentType
-from user.serializers.user_serializer import UserInfoSerializer
+import re
 
 
-class CommentSerializer(serializers.ModelSerializer):
-    owner = UserInfoSerializer(read_only=True)
+class CommentSerializer(ReactionGenericSerializer):
     replies = RecursiveSerializer(
         source="comments_reply", many=True, read_only=True)
 
     class Meta:
         model = Comment
-        fields = ('id', 'body', 'owner', 'reply',
-                  'replies', 'created_at', 'updated_at', 'likes_count', 'bookmarks_count')
+        fields = ReactionGenericSerializer.Meta.fields + \
+            ('body', 'reply', 'replies')
 
 
 class CommentCreateSerializer(serializers.ModelSerializer):
@@ -21,8 +23,11 @@ class CommentCreateSerializer(serializers.ModelSerializer):
         model = Comment
         fields = ('id', 'body', 'reply')
 
-    def validate(self, attrs):
-        return super().validate(attrs)
+    def validate_body(self, text):
+        words = set(re.sub("[^\w]", " ",  text).split())
+        if any(censored_word in words for censored_word in BAD_WORDS):
+            raise ValidationError("censored content!")
+        return text
 
     def create(self, validated_data):
         lookup_field = self.context['view'].lookup_field

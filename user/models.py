@@ -3,6 +3,8 @@ from django.db import models
 from django.contrib.auth.models import (
     AbstractBaseUser, BaseUserManager, PermissionsMixin)
 from config.common_models import AbstractModel
+from django.core.validators import MaxValueValidator, MinValueValidator
+
 
 class CustomUserManager(BaseUserManager):
 
@@ -36,14 +38,18 @@ class CustomUserManager(BaseUserManager):
 
 
 class User(AbstractBaseUser, PermissionsMixin, AbstractModel):
-    email = models.EmailField(verbose_name='email address', max_length=255, unique=True, db_index=True)
+    email = models.EmailField(
+        verbose_name='email address', max_length=255, unique=True, db_index=True)
     name = models.CharField(max_length=255, null=True, blank=True)
     surname = models.CharField(max_length=255, null=True, blank=True)
     birth_date = models.DateField(max_length=8, null=True, blank=True)
 
-    image = models.ImageField(null=True, blank=True, upload_to='profile', verbose_name="profile image")
+    image = models.ImageField(
+        null=True, blank=True, upload_to='profile', verbose_name="profile image")
 
     description = models.TextField(null=True, blank=True)
+    rating = models.FloatField(null=False, default=5, validators=(
+        MaxValueValidator(5), MinValueValidator(1)))
 
     last_login = models.DateTimeField(auto_now_add=True, null=True)
     verified = models.BooleanField(default=False)

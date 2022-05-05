@@ -8,4 +8,5 @@ from user.serializers.group_serializer import GroupSerializer
 class GroupListView(generics.ListAPIView):
     serializer_class = GroupSerializer
     queryset = Group.objects.all()
+    pagination_class = None
     permission_classes = (permissions.AllowAny,)

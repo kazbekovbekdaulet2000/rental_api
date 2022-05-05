@@ -21,11 +21,24 @@ class ProductList(generics.ListCreateAPIView):
         return ProductBaseSerializer
 
 
+class ProductMyList(generics.ListCreateAPIView):
+    permission_classes = (IsOwnerAndLandlord, )
+
+    def get_queryset(self):
+        return Product.objects.filter(owner=self.request.user)
+
+    def get_serializer_class(self):
+        if(self.request.method == "POST"):
+            return ProductCreateSerializer
+        return ProductBaseSerializer
+
+
 class ProductImageList(generics.ListCreateAPIView):
     parser_classes = (parsers.FormParser,
                       parsers.MultiPartParser, parsers.FileUploadParser)
     permission_classes = (
         permissions.IsAuthenticatedOrReadOnly, ProductOwnerAndLandlord)
+    pagination_class = None
     serializer_class = ImageCreateSerializer
     lookup_field = 'id'
 
@@ -58,8 +71,8 @@ class ProductFavoriteList(generics.ListAPIView):
         return Product.objects.filter(id__in=ids)
 
 
-class ProductDetail(generics.RetrieveAPIView):
+class ProductDetail(generics.RetrieveDestroyAPIView):
     lookup_field = 'id'
-    permission_classes = (permissions.AllowAny,)
+    permission_classes = (IsOwnerAndLandlord,)
     queryset = Product.objects.all()
     serializer_class = ProductBaseSerializer

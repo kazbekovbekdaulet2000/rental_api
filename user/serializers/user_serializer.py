@@ -1,20 +1,26 @@
+from email.policy import default
 from django.contrib.auth import get_user_model
 from rest_framework import serializers
 from datetime import date
+from django.contrib.auth.models import Group
 
-User = get_user_model()
+from user.models import User
 
 
 class UserSerializer(serializers.ModelSerializer):
     re_password = serializers.CharField(
         style={'input_type': 'password'}, write_only=True)
+    user_type = serializers.ChoiceField(
+        choices=('landlord', 'tenant'), default='tenant', write_only=True)
+    password = serializers.CharField(write_only=True)
 
     class Meta:
         model = User
         fields = ['email', 'name', 'surname',
-                  'birth_date', 'password', 're_password', 'groups']
+                  'birth_date', 'password', 're_password', 'user_type']
         extra_fields = {
-            'password': {'write_only': True}
+            'password': {'write_only': True},
+            're_password': {'write_only': True},
         }
 
     def validate(self, attrs):
@@ -32,36 +38,38 @@ class UserSerializer(serializers.ModelSerializer):
         return attrs
 
     def create(self, validated_data):
-        groups_data = validated_data.pop('groups')
+        user_type = validated_data.pop('user_type')
+        group = Group.objects.get(name=user_type)
         user = User.objects.create(**validated_data)
-        for group_data in groups_data:
-            user.groups.add(group_data)
+        user.groups.add(group)
         return user
 
     def save(self):
         del self.validated_data['re_password']
-        groups_data = self.validated_data.pop('groups')
-        user = User.objects.create(**self.validated_data)
-        for group_data in groups_data:
-            user.groups.add(group_data)
-        # groups_data = self.validated_data.pop('groups')
-        # account = User(
-        #     **self.validated_data
-        # )
-        # password = self.validated_data['password']
-        # account.set_password(password)
-        # account.save()
-        # for group_data in groups_data:
-        #     account.groups.add(group_data)
+        user_type = self.validated_data.pop('user_type')
+        group = Group.objects.get(name=user_type)
+        account = User(
+            **self.validated_data
+        )
+        password = self.validated_data['password']
+        account.set_password(password)
+        account.save()
+        account.groups.add(group)
 
 
 class UserInfoSerializer(serializers.ModelSerializer):
-    groups = serializers.StringRelatedField(many=True)
+    user_type = serializers.SerializerMethodField()
+
+    def get_user_type(self, user: User):
+        if Group.objects.get(name='landlord') in user.groups.all():
+            return Group.objects.get(name='landlord').name
+        return Group.objects.get(name='tenant').name
 
     class Meta:
         model = User
         fields = ['id', 'email', 'image', 'name',
-                  'surname', 'birth_date', 'description', 'verified', 'is_superuser', 'groups']
+                  'surname', 'birth_date', 'description', 'rating',
+                  'verified', 'is_superuser', 'user_type']
 
 
 class UserUpdateSerializer(serializers.ModelSerializer):

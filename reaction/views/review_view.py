@@ -12,8 +12,7 @@ class ReviewList(generics.ListCreateAPIView):
 
     def get_queryset(self):
         return Review.objects\
-            .get_object_by_model(model=self.model, id=self.kwargs.get(self.lookup_field))\
-            .filter(reply__isnull=True)
+            .get_object_by_model(model=self.model, id=self.kwargs.get(self.lookup_field))
 
     def get_serializer_class(self):
         if self.request.method == "POST":
@@ -24,7 +23,8 @@ class ReviewList(generics.ListCreateAPIView):
 class ReviewDetail(generics.RetrieveUpdateDestroyAPIView):
     lookup_field = 'id'
     lookup_url_kwarg = 'review_id'
-    permission_classes = [ObjectOwnerOrAdmin,permissions.IsAuthenticatedOrReadOnly]
+    permission_classes = [ObjectOwnerOrAdmin,
+                          permissions.IsAuthenticatedOrReadOnly]
     model = None
 
     def get_serializer_class(self):
