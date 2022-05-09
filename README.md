@@ -7,8 +7,7 @@
 # Авторизация
 JWT (Simple JWT) - так как там встроен токены для access/refresh
 Django roles - tenant, landlord (арентодатор, арентодатель )
-Поля для usera - email, name, surname, firstname, birthdate,
-через signals создается one to one relation для профиля  
+Поля для usera - email, name, surname, firstname, birthdate 
 Сброс пароля через email
 
 ![alt text](https://github.com/kazbekovbekdaulet2000/rental_api/blob/master/materials/auth_openapi.png)
